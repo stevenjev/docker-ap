@@ -1,0 +1,19 @@
+version: '3'
+services:
+  ap:
+    build:
+      context: .
+    network_mode: "host"
+    environment:
+      INTERFACE: wlp2s0
+      CHANNEL: 8
+      SSID: docker-ap
+      AP_ADDR: 192.168.254.1
+      SUBNET: 192.168.254.0
+      WPA_PASSPHRASE: passw0rd
+      OUTGOINGS: eno1
+      HT_CAPAB: "[HT40][SHORT-GI-20][DSSS_CCK-40]"
+    tty: true
+    privileged: true
+    restart: unless-stopped
+    command: "/bin/wlanstart.sh"
