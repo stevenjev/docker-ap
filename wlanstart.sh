@@ -53,7 +53,7 @@ rsn_pairwise=CCMP
 wpa_ptk_rekey=600
 ieee80211n=1
 ht_capab=${HT_CAPAB}
-wmm_enabled=1 
+wmm_enabled=1
 EOF
 
 fi
@@ -63,7 +63,7 @@ rfkill unblock wlan
 
 echo "Setting interface ${INTERFACE}"
 
-# Setup interface and restart DHCP service 
+# Setup interface and restart DHCP service
 ip link set ${INTERFACE} up
 ip addr flush dev ${INTERFACE}
 ip addr add ${AP_ADDR}/24 dev ${INTERFACE}
@@ -71,29 +71,31 @@ ip addr add ${AP_ADDR}/24 dev ${INTERFACE}
 # NAT settings
 echo "NAT settings ip_dynaddr, ip_forward"
 
-for i in ip_dynaddr ip_forward ; do 
+for i in ip_dynaddr ip_forward ; do
   if [ $(cat /proc/sys/net/ipv4/$i) ]; then
-    echo $i already 1 
+    echo $i already 1
   else
     echo "1" > /proc/sys/net/ipv4/$i
   fi
 done
 
-cat /proc/sys/net/ipv4/ip_dynaddr 
+cat /proc/sys/net/ipv4/ip_dynaddr
 cat /proc/sys/net/ipv4/ip_forward
 
 if [ "${OUTGOINGS}" ] ; then
    ints="$(sed 's/,\+/ /g' <<<"${OUTGOINGS}")"
    for int in ${ints}
    do
-      echo "Setting iptables for outgoing traffics on ${int}..."
-      iptables -t nat -D POSTROUTING -s ${SUBNET}/24 -o ${int} -j MASQUERADE > /dev/null 2>&1 || true
-      iptables -t nat -A POSTROUTING -s ${SUBNET}/24 -o ${int} -j MASQUERADE
+     echo "Setting iptables for outgoing traffics on ${int}..."
+     iptables -t nat -A POSTROUTING -o ${int} -j MASQUERADE
+     iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+     iptables -A FORWARD -i ${INTERFACE} -o ${int} -j ACCEPT
    done
 else
-   echo "Setting iptables for outgoing traffics on all interfaces..."
-   iptables -t nat -D POSTROUTING -s ${SUBNET}/24 -j MASQUERADE > /dev/null 2>&1 || true
-   iptables -t nat -A POSTROUTING -s ${SUBNET}/24 -j MASQUERADE
+  echo "Setting iptables for outgoing traffics on all interfaces..."
+  iptables -t nat -A POSTROUTING -j MASQUERADE
+  iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+  iptables -A FORWARD -i ${INTERFACE} -j ACCEPT
 fi
 echo "Configuring DHCP server .."
 
@@ -110,5 +112,5 @@ echo "Starting DHCP server .."
 dhcpd ${INTERFACE}
 
 echo "Starting HostAP daemon ..."
-/usr/sbin/hostapd /etc/hostapd.conf 
+/usr/sbin/hostapd /etc/hostapd.conf
 
