@@ -1,4 +1,4 @@
-# Docker container stack: hostap + dhcp server 
+# Docker container stack: hostap + dhcp server
 
 This container starts wireless access point (hostap) and dhcp server in docker
 container. It supports both host networking and network interface reattaching
@@ -35,26 +35,16 @@ country ES: DFS-ETSI
         (57000 - 66000 @ 2160), (N/A, 40), (N/A)
 ```
 
-## Build / run
+## Run using docker-compose
 
-* Using host networking:
-
-```
-sudo docker run -d -t -e INTERFACE=wlan0 --net host --privileged offlinehacker/docker-ap
-```
-
-* Using network interface reattaching:
+Copy the `docker-compose.yml.example` to make `docker-compose.yml`
 
 ```
-sudo docker run -d -t -e INTERFACE=wlan0 -v /var/run/docker.sock:/var/run/docker.sock --privileged offlinehacker/docker-ap
+$ cp docker-compose.yml.example docker-compose.yml
 ```
 
-This mode requires access to docker socket, so it can run a short lived
-container that reattaches network interface to network namespace of this
-container. It also renames wifi interface to **wlan0**, so you get
-deterministic networking environment. This mode can be usefull for example for
-pentesting, where can you use docker compose to run other wifi hacking tools
-and have deterministic environment with wifi interface.
+Now, edit the environment variables to match your preference.
+See below what each of those variables mean.
 
 ## Environment variables
 
@@ -65,9 +55,9 @@ and have deterministic environment with wifi interface.
 * **AP_ADDR**: Access point address (default: 192.168.254.1)
 * **SSID**: Access point SSID (default: docker-ap)
 * **WPA_PASSPHRASE**: WPA password (default: passw0rd)
-* **HW_MODE**: WIFI mode to use (default: g) 
+* **HW_MODE**: WIFI mode to use (default: g)
 * **DRIVER**: WIFI driver to use (default: nl80211)
-* **HT_CAPAB**: WIFI HT capabilities for 802.11n (default: [HT40-][SHORT-GI-20][SHORT-GI-40]) 
+* **HT_CAPAB**: WIFI HT capabilities for 802.11n (default: [HT40-][SHORT-GI-20][SHORT-GI-40])
 * **MODE**: Mode to run in guest/host (default: host)
 
 ## License
@@ -76,7 +66,8 @@ MIT
 
 ## Author
 
-Jaka Hudoklin <jakahudoklin@gmail.com>
+Sri Vishnu Totakura <srivishnu@totakura.in>
 
-Thanks to https://github.com/sdelrio/rpi-hostap for providing original
-implementation.
+Inspired from https://github.com/sdelrio/rpi-hostap,
+https://github.com/offlinehacker/docker-ap, and
+https://github.com/EmbeddedAndroid/docker-ap
