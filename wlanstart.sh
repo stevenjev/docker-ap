@@ -6,6 +6,8 @@ if [ ! -w "/sys" ] ; then
     exit 1
 fi
 
+sleep 10
+
 # Default values
 true ${INTERFACE:=wlan0}
 true ${SUBNET:=192.168.254.0}
